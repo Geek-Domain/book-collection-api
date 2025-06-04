@@ -12,10 +12,13 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if os.Getenv("GIN_MODE") != "release" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Println("Warning: .env file not loaded (not needed on Render)")
+		}
 	}
+
 	config.ConnectDB()
 
 	gin.SetMode(gin.ReleaseMode)
