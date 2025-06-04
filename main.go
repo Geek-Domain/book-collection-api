@@ -12,10 +12,10 @@ import (
 )
 
 func main() {
-	if os.Getenv("GIN_MODE") != "release" {
-		err := godotenv.Load()
-		if err != nil {
-			log.Println("Warning: .env file not loaded (not needed on Render)")
+	// Only try to load .env locally
+	if os.Getenv("RENDER") != "true" {
+		if err := godotenv.Load(); err != nil {
+			log.Println("⚠️  .env file not found locally (ok if running on Render)")
 		}
 	}
 
@@ -33,6 +33,7 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	router.Run(":" + port)
 
+	log.Println("✅ Server running on port", port)
+	router.Run(":" + port)
 }
