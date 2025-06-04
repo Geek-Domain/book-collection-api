@@ -18,7 +18,6 @@ func main() {
 			log.Println("⚠️  .env file not found locally (ok if running on Render)")
 		}
 	}
-
 	config.ConnectDB()
 
 	gin.SetMode(gin.ReleaseMode)

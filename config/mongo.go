@@ -14,30 +14,37 @@ import (
 var DB *mongo.Database
 
 func ConnectDB() {
-	// Load env vars from .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	// ✅ Only load .env file locally (not on Render)
+	if os.Getenv("RENDER") != "true" {
+		if err := godotenv.Load(); err != nil {
+			log.Println("⚠️  .env file not loaded — this is expected on Render.")
+		} else {
+			log.Println("✅ Loaded .env file")
+		}
 	}
 
-	// Get Mongo URI from environment
+	// ✅ Get Mongo URI from environment
 	mongoURI := os.Getenv("MONGODB_URI")
+	if mongoURI == "" {
+		log.Fatal("❌ MONGODB_URI is not set in environment variables")
+	}
 
-	// Create client
+	// ✅ Create MongoDB client
 	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
 	if err != nil {
-		log.Fatal("Mongo client creation error:", err)
+		log.Fatalf("❌ Failed to create Mongo client: %v", err)
 	}
 
-	// Connect to MongoDB
+	// ✅ Connect to MongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	err = client.Connect(ctx)
 	if err != nil {
-		log.Fatal("MongoDB connection error:", err)
+		log.Fatalf("❌ MongoDB connection error: %v", err)
 	}
 
+	// ✅ Use the database
 	DB = client.Database("book-db")
 	log.Println("✅ Connected to MongoDB!")
 }
